@@ -1,0 +1,18 @@
+<!DOCTYPE html> 
+
+<h3>List of Collaborators</h3>
+<table cellspacing="5" cellpadding="5">
+
+    {% for collaborator in collaborators %}
+    <tr>
+        <td>{{ collaborator['name'] }}</td>
+        <td> <a href= {{ url_for('spotify.remove_songs_added_by', collaborator_id=collaborator['id']) }}>Remove Songs added by this user</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<h3>List of Songs - {{ songs|length }}</h3>
+{% for song in songs %}
+<li>{{ song['track']['name'] }}</li>
+{% endfor %}

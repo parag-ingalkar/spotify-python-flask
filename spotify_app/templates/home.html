@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+{% for playlist in playlists %}
+<li>
+	<a href=  {{ url_for('spotify.playlist', playlist_id=playlist['id']) }}>{{ playlist['name'] }}</a>
+</li>
+{% endfor %}
