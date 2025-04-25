@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Details</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="playlist-header">
+        <h1 id="playlist-name">Loading...</h1>
+        <p id="track-count">Loading...</p>
+    </div>
+
+    <div class="main-content">
+        <!-- Left Panel: Tracks List -->
+        <div class="left-panel">
+            <h2>Tracks</h2>
+            <div id="track-list">
+                Loading...
+                <!-- Tracks will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Right Panel: Collaborators List -->
+        <div class="right-panel">
+            <h2>Collaborators</h2>
+            <div id="collaborators-list">
+                 Loading...
+                <!-- Collaborators will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get the playlist_id from the URL (assuming it's passed as a parameter)
+    const playlistId = window.location.pathname.split("/").pop();  // Extract the playlist ID from URL
+
+    // Fetch playlist data from your API
+    fetch(`/api/playlists/${playlistId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Set the playlist name and track count
+            document.getElementById('playlist-name').innerText = data.name;
+            document.getElementById('track-count').innerText = `Tracks: ${data.tracks.total}`;
+
+            // Populate track list
+            const trackList = document.getElementById('track-list');
+            trackList.innerHTML="";
+            data.tracks.items.forEach(track => {
+                const trackItem = document.createElement('div');
+                trackItem.classList.add('track-item');
+                trackItem.innerHTML = `${track.track.name} - ${track.track.artists[0].name}`;
+                trackList.appendChild(trackItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching playlist data:', error);
+            document.getElementById('playlist-name').innerText = "Failed to load playlist";
+        });
+
+        fetch(`/api/playlists/${playlistId}/get_collaborators`)
+        .then(response => response.json())
+        .then(data => {
+            // Populate collaborators list (if available)
+            const collaboratorsList = document.getElementById('collaborators-list');
+            collaboratorsList.innerHTML = "";
+
+            if (data && data.length > 0) {
+                data.forEach(collaborator => {
+                    const collaboratorItem = document.createElement('div');
+                    collaboratorItem.classList.add('collaborator-item');
+                    collaboratorItem.style.display = 'flex';
+                    collaboratorItem.style.justifyContent = 'space-between';
+                    collaboratorItem.style.alignItems = 'center';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.innerText = collaborator.name;
+                    
+                    const trashIcon = document.createElement('span');
+                    trashIcon.innerHTML = '🗑️';
+                    trashIcon.style.cursor = 'pointer';
+                    trashIcon.title = 'Remove songs by this collaborator';
+
+                    trashIcon.onclick = () => {
+                        if (confirm(`Remove all songs added by ${collaborator.name}?`)) {
+                            fetch(`/api/playlists/${playlistId}/tracks/remove_by_collaborator`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    collaborator_id: collaborator.id,
+                                    playlist_id: playlistId
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(response => {
+                                alert(`${response.removed_count} songs removed`);
+                            })
+                            .catch(err => {
+                                console.error('Error removing songs:', err);
+                                alert('Failed to remove songs');
+                            });
+                        }
+                    };
+
+
+                    collaboratorItem.appendChild(nameSpan);
+                    collaboratorItem.appendChild(trashIcon);
+                    collaboratorsList.appendChild(collaboratorItem);
+                });
+            } else {
+                collaboratorsList.innerHTML = "<p>No collaborators available</p>";
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching collaborators data:', error);
+            document.getElementById('collaborators-list').innerHTML = "<p>Failed to load collaborators</p>";
+        });
+</script>
+
+</body>
+</html>

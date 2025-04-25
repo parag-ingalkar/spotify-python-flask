@@ -1,15 +1,19 @@
-from flask import Blueprint, g, url_for, redirect, request, session, jsonify
+from flask import Blueprint, url_for, redirect, request, session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime
 import os
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path,override=True)
 
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URL = os.getenv("REDIRECT_URL")
 TOKEN_INFO = "token-info"
 
 bp = Blueprint("auth", __name__)
@@ -22,25 +26,35 @@ def index():
 
 @bp.route("/login")
 def login_to_spotify():
-    session.clear()
-
     auth_url = create_spotify_oauth().get_authorize_url()
     return redirect(auth_url)
 
 
 @bp.route("/callback")
 def callback_page():
+    spOAuth = create_spotify_oauth()
     session.clear()
-    session["user"] = "Parag"
     code = request.args.get("code")
-    token_info = create_spotify_oauth().get_access_token(code)
+    cached_token = spOAuth.get_cached_token()
+    token_info = spOAuth.get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for("auth.home", _external=True))
+    return redirect(url_for("auth.home"))
 
+
+def create_spotify_oauth():
+    scope = "playlist-modify-public playlist-modify-private playlist-read-collaborative"
+
+    return SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URL,
+        scope=scope,
+    )
 
 def get_token():
     token_info = session.get(TOKEN_INFO, None)
 
+    print(token_info)
     if not token_info:
         return None
 
@@ -51,14 +65,6 @@ def get_token():
     return token_info
 
 
-def create_spotify_oauth():
-    scope = "playlist-modify-public playlist-modify-private playlist-read-collaborative"
-    return SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=url_for("auth.callback_page", _external=True),
-        scope=scope,
-    )
 
 
 @bp.route("/home")
@@ -77,4 +83,5 @@ def home():
 @bp.route("/logout")
 def logout():
     session.clear()
+    print("session cleared")
     return redirect(url_for("auth.index"))
