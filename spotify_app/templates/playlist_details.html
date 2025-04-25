@@ -21,6 +21,26 @@
       border: 1px solid #ccc;
       border-radius: 8px;
     }
+    .main-content {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      
+      .left-panel, .right-panel {
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+      
+      .left-panel {
+        flex: 2; /* Takes more space */
+      }
+
+      .right-panel {
+        flex: 1; /* Takes less space */
+      }
   </style>
 <body>
 
@@ -28,32 +48,26 @@
     <h1>Spotify Web App</h1>
     <div id="auth-section">
 		<a href="/logout"><button>Logout</button></a>
-        <!-- This will show Login or user info -->
     </div>
 </header>
 
 <div class="container">
     <div class="playlist-header">
         <h1 id="playlist-name">Loading...</h1>
-        <p id="track-count">Loading...</p>
     </div>
 
     <div class="main-content">
-        <!-- Left Panel: Tracks List -->
         <div class="left-panel">
-            <h2>Tracks</h2>
+            <h2>Tracks (<span id="track-count-heading">0</span>)</h2>
             <div id="track-list">
                 Loading...
-                <!-- Tracks will be dynamically added here -->
             </div>
         </div>
 
-        <!-- Right Panel: Collaborators List -->
         <div class="right-panel">
-            <h2>Collaborators</h2>
+            <h2>Collaborators (<span id="collaborator-count-heading">0</span>)</h2>
             <div id="collaborators-list">
                  Loading...
-                <!-- Collaborators will be dynamically added here -->
             </div>
         </div>
     </div>
@@ -62,15 +76,14 @@
 <script>   
     
    const playlistId = "{{playlist_id}}"
-    // Fetch playlist data from your API
+    
     fetch(`/api/playlists/${playlistId}`)
         .then(response => response.json())
         .then(data => {
-            // Set the playlist name and track count
+            
             document.getElementById('playlist-name').innerText = data.name;
-            document.getElementById('track-count').innerText = `Tracks: ${data.tracks.total}`;
-
-            // Populate track list
+            document.getElementById('track-count-heading').innerText = data.tracks.total;
+            
             const trackList = document.getElementById('track-list');
             trackList.innerHTML="";
             data.tracks.items.forEach(track => {
@@ -88,11 +101,12 @@
         fetch(`/api/playlists/${playlistId}/get_collaborators`)
         .then(response => response.json())
         .then(data => {
-            // Populate collaborators list (if available)
+            
             const collaboratorsList = document.getElementById('collaborators-list');
             collaboratorsList.innerHTML = "";
 
             if (data && data.length > 0) {
+                document.getElementById('collaborator-count-heading').innerText = data.length;
                 data.forEach(collaborator => {
                     const collaboratorItem = document.createElement('div');
                     collaboratorItem.classList.add('collaborator-item');
@@ -137,6 +151,7 @@
                     collaboratorsList.appendChild(collaboratorItem);
                 });
             } else {
+                document.getElementById('collaborator-count-heading').innerText = 0;
                 collaboratorsList.innerHTML = "<p>No collaborators available</p>";
             }
         })

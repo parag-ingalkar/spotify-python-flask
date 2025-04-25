@@ -11,5 +11,5 @@ def home():
 def playlist_view(playlist_id):
     token_info = get_token()
     if not token_info:
-        return render_template("home.html", logged_in=False)
-    return render_template("playlist_details.html", playlist_id=playlist_id, logged_in=True)
+        return render_template("home.html")
+    return render_template("playlist_details.html", playlist_id=playlist_id)
