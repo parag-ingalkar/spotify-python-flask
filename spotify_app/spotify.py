@@ -1,35 +1,17 @@
-from flask import (
-    Blueprint,
-    g,
-    url_for,
-    redirect,
-    request,
-    session,
-    jsonify,
-    render_template,
-)
+from flask import Blueprint, url_for, redirect, request, session, jsonify, render_template
 import spotipy
-import json
-from datetime import datetime
-from .auth import get_token
+from .auth import get_token, get_spotify_client
 
 bp = Blueprint("spotify", __name__)
-
-@bp.route("/playlists")
-def all_playlists():
-    token_info = get_token()
-    if not token_info:
-        return redirect(url_for("auth.login_to_spotify"))
-    return render_template("home.html")
 
 
 @bp.route("/api/playlists")
 def api_all_playlists():
     token_info = get_token()
     if not token_info:
-        return redirect(url_for("auth.login_to_spotify"))
+        return jsonify({"error": "Unauthorized"}), 401
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
+    sp = get_spotify_client()
 
     playlists = sp.current_user_playlists(limit=50)["items"]
     return jsonify(playlists)
@@ -38,18 +20,17 @@ def api_all_playlists():
 def playlist(playlist_id):
     token_info = get_token()
     if not token_info:
-        return redirect(url_for("auth.login_to_spotify"))
-    return render_template("playlist_details.html")
+        return render_template("home.html")
+    return render_template("playlist_details.html", playlist_id=playlist_id)
 
 @bp.route("/api/playlists/<playlist_id>")
 def api_playlist(playlist_id):
-    session["playlist_id"] = playlist_id
     token_info = get_token()
     if not token_info:
-        return redirect(url_for("auth.login_to_spotify"))
+        return jsonify({"error": "Unauthorized"}), 401
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
-    playlist = sp.playlist(playlist_id=playlist_id)
+    sp = get_spotify_client()
+    playlist = sp.playlist(playlist_id)
 
     return jsonify(playlist)
 
@@ -59,9 +40,9 @@ def get_collaborators(playlist_id):
     
     token_info = get_token()
     if not token_info:
-        return []
+        return jsonify({"error": "Unauthorized"}), 401
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
+    sp = get_spotify_client()
     
     # Fetch the tracks from the playlist
     results = sp.playlist_tracks(playlist_id)
@@ -81,27 +62,22 @@ def get_collaborators(playlist_id):
     collaborator_details = []
     for user_id in collaborators:
         user = sp.user(user_id)
-        collaborator_details.append({
-            'id': user['id'],
-            'name': user['display_name'],
-            'profile_url': user['external_urls']['spotify']
-        })
+        collaborator_details.append(user)
     return jsonify(collaborator_details)
 
 
 @bp.route("/api/playlists/<playlist_id>/tracks/remove_by_collaborator", methods=["POST"])
-def remove_songs_added_by(collaborator_id):
+def remove_songs_added_by(playlist_id):
     token_info = get_token()
     if not token_info:
         return jsonify({"error": "Not authenticated"}), 401
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
+    sp = get_spotify_client()
 
     data = request.get_json()
     collaborator_id = data.get("collaborator_id")
-    playlist_id = data.get("playlist_id")
 
-    if not collaborator_id or not playlist_id:
+    if not collaborator_id:
         return jsonify({"error": "Missing parameters"}), 400
     
     songs_to_remove = []
@@ -121,7 +97,5 @@ def remove_songs_added_by(collaborator_id):
         start_idx = i * chunk_size
         end_idx = min((i + 1) * chunk_size, len(songs_to_remove))
         current_chunk = songs_to_remove[start_idx:end_idx]
-        # sp.user_playlist_remove_all_occurrences_of_tracks(
-        #     user, playlist_id, current_chunk, snapshot_id=None
-        # )
+        sp.playlist_remove_all_occurrences_of_items(playlist_id, current_chunk)
     return jsonify({"status": "success", "removed_count": len(songs_to_remove)})

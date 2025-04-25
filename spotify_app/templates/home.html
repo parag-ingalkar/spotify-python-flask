@@ -1,29 +1,92 @@
 <!DOCTYPE html>
-
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spotify Web App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .playlist {
+      margin: 1rem 0;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
 <body>
-	<h1>Your Playlists</h1>
-	<div id="playlists">Loading...</div>
-  
-	<script>
-	  async function loadPlaylists() {
-		try {
-		  const res = await fetch("/api/playlists");
-		  const playlists = await res.json();
-  
-		  const container = document.getElementById("playlists");
-		  container.innerHTML = playlists.map(p => `
-			<div class="playlist">
-			  <strong>${p.name}</strong> (${p.tracks.total} tracks)
-			  <a href="/playlists/${p.id}">${p.name}</a>
-			</div>
-		  `).join('');
-		} catch (err) {
-		  console.error(err);
-		  document.getElementById("playlists").innerText = "Failed to load playlists.";
-		}
-	  }
-  
-	  loadPlaylists();
-	</script>
-  </body>
-  
+  <header>
+    <h1>Spotify Web App</h1>
+    <div id="auth-section">
+      <!-- This will show Login or user info -->
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Content will be updated depending on login state -->
+    Loading...
+  </main>
+
+  <script>
+    async function checkLogin() {
+      try {
+        const res = await fetch("/api/me");
+        if (res.status === 200) {
+          const user = await res.json();
+          showLoggedIn(user);
+        } else {
+          showLoggedOut();
+        }
+      } catch (e) {
+        console.error("Login check failed:", e);
+        showLoggedOut();
+      }
+    }
+
+    function showLoggedOut() {
+      document.getElementById("auth-section").innerHTML = `
+        <a href="/login"><button>Login</button></a>
+      `;
+      document.getElementById("main-content").innerHTML = `
+        <p>Welcome to the Spotify Web App! Please log in to view your playlists.</p>
+      `;
+    }
+
+    function showLoggedIn(user) {
+      document.getElementById("auth-section").innerHTML = `
+        <span>Welcome, ${user.display_name}</span>
+		<a href="/logout"><button>Logout</button></a>
+      `;
+      loadPlaylists();
+    }
+
+    async function loadPlaylists() {
+      try {
+        const res = await fetch("/api/playlists");
+        const playlists = await res.json();
+
+        const html = playlists.map(p => `
+          <div class="playlist">
+            <strong>${p.name}</strong> (${p.tracks.total} tracks)<br>
+            <a href="/playlists/${p.id}">View Playlist</a>
+          </div>
+        `).join('');
+
+        document.getElementById("main-content").innerHTML = html;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("main-content").innerText = "Failed to load playlists.";
+      }
+    }
+
+    checkLogin();
+  </script>
+</body>
+</html>

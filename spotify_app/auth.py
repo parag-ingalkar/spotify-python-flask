@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for, redirect, request, session
+from flask import Blueprint, url_for, redirect, request, session, render_template, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime
@@ -18,11 +18,43 @@ TOKEN_INFO = "token-info"
 
 bp = Blueprint("auth", __name__)
 
+def create_spotify_oauth():
+    scope = (
+        "playlist-modify-public playlist-modify-private "
+        "playlist-read-collaborative playlist-read-private user-read-private"
+    )
+    return SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URL,
+        scope=scope,
+        cache_handler=None,
+        show_dialog=True
+    )
+
+def get_token():
+    token_info = session.get(TOKEN_INFO, None)
+    if not token_info:
+        return None
+
+    # Refresh if expired
+    spotify_oauth = create_spotify_oauth()
+
+    if spotify_oauth.is_token_expired(token_info):
+        print("Token expired. Refreshing...")
+        token_info = spotify_oauth.refresh_access_token(token_info["refresh_token"])
+        session[TOKEN_INFO] = token_info
+    return token_info
+
+def get_spotify_client():
+    token_info = get_token()
+    if not token_info:
+        return None
+    return spotipy.Spotify(auth=token_info["access_token"])
 
 @bp.route("/")
 def index():
-    return f'<a href={url_for("auth.login_to_spotify")}>Login with Spotify</a>'
-
+    return render_template("home.html")
 
 @bp.route("/login")
 def login_to_spotify():
@@ -32,56 +64,31 @@ def login_to_spotify():
 
 @bp.route("/callback")
 def callback_page():
-    spOAuth = create_spotify_oauth()
-    session.clear()
     code = request.args.get("code")
-    cached_token = spOAuth.get_cached_token()
-    token_info = spOAuth.get_access_token(code)
+    if not code:
+        return "Authorization failed.", 400
+    
+    spotify_oauth = create_spotify_oauth()
+    token_info = spotify_oauth.get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for("auth.home"))
-
-
-def create_spotify_oauth():
-    scope = "playlist-modify-public playlist-modify-private playlist-read-collaborative"
-
-    return SpotifyOAuth(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        redirect_uri=REDIRECT_URL,
-        scope=scope,
-    )
-
-def get_token():
-    token_info = session.get(TOKEN_INFO, None)
-
-    print(token_info)
-    if not token_info:
-        return None
-
-    elif datetime.now().timestamp() > token_info["expires_at"]:
-        print("token expired. Refreshing now...")
-        spotify_oauth = create_spotify_oauth()
-        token_info = spotify_oauth.refresh_access_token(token_info["refresh_token"])
-    return token_info
-
-
-
-
-@bp.route("/home")
-def home():
-    token_info = get_token()
-    sp = spotipy.Spotify(auth=token_info["access_token"])
-    session["user_id"] = sp.current_user()["id"]
-    return f"""
-    <a href={url_for("spotify.all_playlists")}>Playlist</a>
-    <br>
-    <a href={url_for("auth.logout")}>Logout</a>
-    <br>
-    {session.get('user')}"""
+    return render_template("home.html")
 
 
 @bp.route("/logout")
 def logout():
     session.clear()
     print("session cleared")
-    return redirect(url_for("auth.index"))
+    return render_template("home.html")
+
+
+@bp.route("/api/me")
+def api_me():
+    sp = get_spotify_client()
+    if not sp:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        user = sp.current_user()
+        return jsonify(user)
+    except spotipy.SpotifyException as e:
+        return jsonify({"error": "Failed to fetch user info"}), 500
