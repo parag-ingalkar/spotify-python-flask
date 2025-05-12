@@ -22,3 +22,6 @@ def logout():
     session.clear()
     return redirect(url_for("ui.home"))
 
+@bp.route("/hello")
+def hello():
+    return {'message': 'Hello from Flask!'}
