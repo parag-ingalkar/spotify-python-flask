@@ -15,12 +15,19 @@ def callback_page():
         return "Authorization failed.", 400
     token_info = create_spotify_oauth().get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for("ui.home"))
+    # return redirect(url_for("ui.home"))
+    return redirect("http://127.0.0.1:5173/dashboard")
 
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("ui.home"))
+    # return redirect(url_for("ui.home"))
+    return redirect("http://127.0.0.1:5173/")
+
+@bp.route("/check-auth")
+def check_auth():
+    token_info = session.get(TOKEN_INFO, None)
+    return {"authenticated": bool(token_info)}
 
 @bp.route("/hello")
 def hello():

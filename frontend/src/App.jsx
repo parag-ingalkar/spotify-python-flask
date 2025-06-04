@@ -1,21 +1,17 @@
-import { useState, useEffect } from 'react';
+import "bootstrap/dist/css/bootstrap.min.css";
+//App.jsx
+
+import { Routes, Route } from "react-router-dom";
+import { Home } from "./components/Home";
+import { Dashboard } from "./components/Dashboard";
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://localhost:5000/hello') // temporary test endpoint
-      .then(response => response.json())
-      .then(data => setMessage(data.message))
-      .catch(err => console.error('Error:', err));
-  }, []);
-
-  return (
-    <div>
-      <h1>Spotify React Frontend</h1>
-      <p>Backend says: {message}</p>
-    </div>
-  );
+	return (
+		<Routes>
+			<Route path="/" element={<Home />} />
+			<Route path="/dashboard" element={<Dashboard />} />
+		</Routes>
+	);
 }
 
 export default App;
