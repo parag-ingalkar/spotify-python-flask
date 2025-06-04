@@ -1,52 +1,35 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const PlaylistCard = ({ playlist }) => {
-	const imageUrl =
-		playlist.images && playlist.images.length > 0
-			? playlist.images[0].url
-			: "/playlist.png";
+	const navigate = useNavigate();
+	const imageUrl = playlist.images?.[0]?.url || "/playlist.png";
+
+	const handleCardClick = () => {
+		navigate(`/dashboard/playlists/${playlist.id}`);
+	};
 
 	return (
-		<div className="playlist-card">
-			<div className="card mb-5">
-				<div className="row g-0">
-					<div className="playlist-image col-md-4">
-						<img
-							src={imageUrl}
-							className="img-fluid rounded-start"
-							alt={playlist.name}
-							width="180"
-							height="180"
-						/>
-					</div>
-					<div className="playlist-details col-md-8">
-						<div className="card-body">
-							<div>
-								<Link
-									to={`/dashboard/playlists/${playlist.id}`}
-									style={{ textDecoration: "none" }}
-								>
-									<h5 className="card-title">{playlist.name}</h5>
-									<p className="card-text">{playlist.owner.display_name}</p>
-									<p className="card-text">
-										<small className="text-muted">
-											Tracks: {playlist.tracks.total}
-										</small>
-									</p>
-								</Link>
-							</div>
-							<div className="playlist-spotify-link mt-3">
-								<a
-									href={playlist.external_urls.spotify}
-									className="btn btn-primary"
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Open in Spotify
-								</a>
-							</div>
-						</div>
-					</div>
+		<div
+			onClick={handleCardClick}
+			className="flex flex-col gap-2 p-8 cursor-pointer sm:flex-row sm:items-center sm:gap-6 sm:py-4 hover:bg-gray-700"
+		>
+			<div className="flex gap-6 items-end">
+				<img
+					src={imageUrl}
+					alt="Playlist cover"
+					className="w-48 h-48 rounded shadow-lg object-cover bg-gray-800"
+				/>
+				<div>
+					<p className="uppercase text-sm font-semibold text-gray-400">
+						Public Playlist
+					</p>
+					<p className="text-sm font-semibold text-gray-400">{playlist.id}</p>
+					<h1 className="text-5xl text-white font-bold mt-2">
+						{playlist.name}
+					</h1>
+					<p className="text-gray-300 mt-2">
+						{playlist.owner?.display_name} • {playlist.tracks?.total || 0} songs
+					</p>
 				</div>
 			</div>
 		</div>

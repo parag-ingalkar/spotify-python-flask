@@ -42,3 +42,4 @@ instance/
 *.swp
 *.swo
 .DS_Store
+frontend/src/components/Collaborators.jsx

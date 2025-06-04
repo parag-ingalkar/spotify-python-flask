@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
+import { useState } from "react";
 
 export const NavBar = () => {
 	const {
@@ -14,73 +15,84 @@ export const NavBar = () => {
 		console.log("Logout");
 		// window.location.href = "http://127.0.0.1:5000/logout"; // or use fetch + redirect
 	};
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
 	return (
-		<>
-			<nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-				<div className="container-fluid">
-					{/* Brand - Left */}
-					<Link className="navbar-brand" to="/">
-						Spotify
-					</Link>
+		<nav className="bg-gray-900 px-4 py-3">
+			<div className="container mx-auto flex items-center justify-between">
+				{/* Brand */}
+				<Link to="/" className="text-white font-bold text-xl">
+					Spotify
+				</Link>
 
-					{/* Toggle button - visible only on small screens */}
-					<button
-						className="navbar-toggler"
-						type="button"
-						data-bs-toggle="collapse"
-						data-bs-target="#navbarNav"
-						aria-controls="navbarNav"
-						aria-expanded="false"
-						aria-label="Toggle navigation"
+				{/* Toggle button for mobile */}
+				<button
+					className="text-white md:hidden"
+					onClick={() => setIsMenuOpen(!isMenuOpen)}
+				>
+					<svg
+						className="w-6 h-6"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
 					>
-						<span className="navbar-toggler-icon"></span>
-					</button>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M4 6h16M4 12h16M4 18h16"
+						/>
+					</svg>
+				</button>
 
-					{/* Collapsible nav links - Center (or collapsed in small view) */}
-					<div className="collapse navbar-collapse" id="navbarNav">
-						<ul className="navbar-nav me-auto">
-							<li className="nav-item">
-								<a className="nav-link active" href="#">
-									Playlists
-								</a>
-							</li>
-						</ul>
-					</div>
+				{/* Links */}
+				<div
+					className={`${
+						isMenuOpen ? "block" : "hidden"
+					} md:flex md:items-center md:space-x-6`}
+				>
+					<Link to="/dashboard" className="text-white hover:text-amber-400">
+						Playlists
+					</Link>
+				</div>
 
-					{/* Profile picture & dropdown - Always visible, Right-aligned */}
-					{user && (
-						<div className="dropdown d-flex align-items-center ms-auto">
+				{/* Profile dropdown */}
+				{user && (
+					<div className="relative ml-4">
+						<button
+							onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+							className="flex items-center space-x-2"
+						>
+							<span className="text-white hidden lg:inline">
+								{user.display_name}
+							</span>
 							<img
 								src={profileImg}
 								alt="Profile"
-								width="40"
-								height="40"
-								className="rounded-circle dropdown-toggle"
-								role="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
+								className="w-10 h-10 rounded-full"
 							/>
-							<ul className="dropdown-menu dropdown-menu-end">
-								<li className="dropdown-item-text">
-									<strong>{user.display_name}</strong>
+						</button>
+
+						{isDropdownOpen && (
+							<ul className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+								<li className="px-4 py-2 font-semibold text-gray-800 border-b">
+									{user.display_name}
 								</li>
 								<li>
-									<hr className="dropdown-divider" />
-								</li>
-								<li>
-									<button className="dropdown-item" onClick={handleLogout}>
+									<button
+										className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+										onClick={handleLogout}
+									>
 										Logout
 									</button>
 								</li>
 							</ul>
-							<span className="text-white d-none d-lg-inline ms-2">
-								{user.display_name}
-							</span>
-						</div>
-					)}
-				</div>
-			</nav>
-		</>
+						)}
+					</div>
+				)}
+			</div>
+		</nav>
 	);
 };

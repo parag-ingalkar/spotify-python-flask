@@ -1,4 +1,4 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 // import "./styles.scss";
 
 //App.jsx
@@ -18,10 +18,7 @@ function App() {
 					<Route exact path="/" element={<Home />} />
 					<Route path="/dashboard" element={<Dashboard />}>
 						<Route index element={<Playlists />} />
-						<Route
-							path="/dashboard/playlists/:id"
-							element={<PlaylistDetails />}
-						/>
+						<Route path="playlists/:id" element={<PlaylistDetails />} />
 					</Route>
 				</Routes>
 			</div>

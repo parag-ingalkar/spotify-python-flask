@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
 import { PlaylistCard } from "./PlaylistCard";
 
@@ -10,18 +9,22 @@ export const Playlists = () => {
 	} = useFetch("http://127.0.0.1:5000/api/playlists");
 
 	return (
-		<>
-			<div className="playlists">
-				<div className="container mt-4">
-					<h2>Your Playlists</h2>
-					{playlistsError && <div> {playlistsError} </div>}
-					{playlistsIsPending && <div> Loading... </div>}
-					{playlists &&
-						playlists.map((playlist) => (
-							<PlaylistCard key={playlist.id} playlist={playlist} />
-						))}
+		<div className="py-8 px-4 md:px-8">
+			<h2 className="text-2xl font-semibold text-white mb-6">Your Playlists</h2>
+
+			{playlistsError && (
+				<div className="text-red-500 font-medium">{playlistsError}</div>
+			)}
+
+			{playlistsIsPending && <div className="text-gray-300">Loading...</div>}
+
+			{playlists && (
+				<div className="space-y-6">
+					{playlists.map((playlist) => (
+						<PlaylistCard key={playlist.id} playlist={playlist} />
+					))}
 				</div>
-			</div>
-		</>
+			)}
+		</div>
 	);
 };

@@ -23,11 +23,13 @@ export const Home = () => {
 	return (
 		<>
 			<div>
-				<div>
+				<div className="text-white">
 					<h2>Welcome to Spotify Playlist Manager</h2>
 					<p>Manage your collaborative playlist.</p>
 					<div>
-						<button onClick={handleGetStarted}>Get Started</button>
+						<button className="border-4" onClick={handleGetStarted}>
+							Get Started
+						</button>
 					</div>
 				</div>
 			</div>
