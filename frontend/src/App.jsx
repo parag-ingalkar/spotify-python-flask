@@ -1,5 +1,4 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "tailwindcss";
 // import "./styles.scss";
 
 //App.jsx
