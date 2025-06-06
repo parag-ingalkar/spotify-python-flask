@@ -33,7 +33,7 @@ def api_playlist(playlist_id):
 
     return jsonify(playlist)
 
-@bp.route("/playlists/<playlist_id>/get_tracks")
+@bp.route("/playlists/<playlist_id>/tracks")
 def get_tracks(playlist_id):
     sp = get_spotify_client()
     if not sp:
@@ -77,7 +77,7 @@ def api_get_collaborators(playlist_id):
 
     return jsonify(collaborators)
 
-@bp.route("/playlists/<playlist_id>/tracks/remove_by_collaborator", methods=["POST"])
+@bp.route("/playlists/<playlist_id>/tracks/remove_by_collaborator", methods=["DELETE"])
 def remove_songs_added_by(playlist_id):
     sp = get_spotify_client()
     if not sp:
@@ -98,17 +98,11 @@ def remove_songs_added_by(playlist_id):
     for i in range(0, len(songs_to_remove), 100):
         sp.playlist_remove_all_occurrences_of_items(playlist_id, songs_to_remove[i:i + 100])
 
+    print("SONGS TO REMOVE " ,songs_to_remove)
+
     return jsonify({"status": "success", "removed_count": len(songs_to_remove)})
 
-@bp.route("/playlists/<playlist_id>/tracks", methods=["GET"])
-def get_tracks_from_playlist(playlist_id):
-    sp = get_spotify_client()
-    if not sp:
-        return jsonify({"error": "Unauthorized"}), 401
 
-    tracks = sp.playlist_tracks(playlist_id)
-
-    return jsonify(tracks)
 
 @bp.route("/playlists/<playlist_id>/tracks/<track_id>", methods=["DELETE"])
 def remove_tracks_from_playlist(playlist_id, track_id):
@@ -118,3 +112,13 @@ def remove_tracks_from_playlist(playlist_id, track_id):
 
     sp.playlist_remove_all_occurrences_of_items(playlist_id=playlist_id,items=[track_id])
     return jsonify({"status": "success"})
+
+@bp.route("/playlists/<playlist_id>/tracks/<track_id>", methods=["GET"])
+def get_track_details(playlist_id, track_id):
+    sp = get_spotify_client()
+    if not sp:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    track = sp.track(track_id)
+
+    return jsonify(track)

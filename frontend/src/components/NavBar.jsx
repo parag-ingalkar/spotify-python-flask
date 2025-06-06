@@ -9,7 +9,7 @@ export const NavBar = () => {
 		error: userError,
 	} = useFetch("http://127.0.0.1:5000/api/me");
 
-	const profileImg = user?.images?.[0]?.url || "/profile.png";
+	const profileImg = user?.images?.[0]?.url || "/user.png";
 
 	const handleLogout = () => {
 		console.log("Logout");

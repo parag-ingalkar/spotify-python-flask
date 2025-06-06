@@ -1,10 +1,13 @@
 import { useParams } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
+import { useState } from "react";
 
 const Songs = () => {
+	const [dropdownOpen, setDropdownOpen] = useState({});
+
 	const { id } = useParams();
 
-	const tracksUrl = "http://127.0.0.1:5000/api/playlists/" + id + "/get_tracks";
+	const tracksUrl = "http://127.0.0.1:5000/api/playlists/" + id + "/tracks";
 
 	const { data: tracks, tracksIsPending, tracksError } = useFetch(tracksUrl);
 
@@ -23,13 +26,13 @@ const Songs = () => {
 
 	return (
 		<div className="mt-10 h-[450px] overflow-y-auto transparent-scrollbar pr-4 overscroll-y-auto bg-scroll">
-			<div className="flex text-sm text-gray-400 border-b border-gray-700 pb-2 sticky top-0 z-10 bg-[#18154a] ">
-				<div className="w-10 flex items-center justify-center">#</div>
-				<div className="flex-1 flex items-center justify-center">Title</div>
-				<div className="w-48 flex items-center justify-center">Album</div>
-				<div className="w-48 flex items-center justify-center">Added by</div>
-				<div className="w-32 flex items-center justify-center">Date added</div>
-				<div className="w-16 flex items-center justify-center">Duration</div>
+			<div className="flex text-sm text-gray-400 border-b border-gray-700 pb-2 sticky top-0 z-50 bg-[#18154a] ">
+				<div className="w-10 flex items-center justify-left">#</div>
+				<div className="flex-1 flex items-center justify-left">Title</div>
+				<div className="w-48 flex items-center justify-left">Album</div>
+				<div className="w-48 flex items-center justify-left">Added by</div>
+				<div className="w-32 flex items-center justify-left">Date added</div>
+				<div className="w-16 flex items-center justify-left">Duration</div>
 				<div className="w-16 flex items-center justify-center"></div>
 			</div>
 			{tracks.map((item, index) => {
@@ -39,7 +42,7 @@ const Songs = () => {
 						key={track.id}
 						className="flex text-sm py-3 border-b border-gray-800 hover:bg-gray-800"
 					>
-						<div className="w-10 flex items-center justify-center">
+						<div className="w-10 flex items-center justify-left">
 							{index + 1}
 						</div>
 						<div className="flex-1 flex items-center gap-4">
@@ -55,12 +58,12 @@ const Songs = () => {
 								</p>
 							</div>
 						</div>
-						<div className="w-48 flex items-center justify-center">
+						<div className="w-48 flex items-center justify-left">
 							{track.album.name}
 						</div>
-						<div className="w-48 flex items-center justify-center">
+						<div className="w-48 flex items-center justify-left">
 							<img
-								src={item.added_by.images?.[1].url}
+								src={item.added_by.images?.[1]?.url || "/user.png"}
 								alt=""
 								className="w-7.5 h-7.5 rounded-full"
 							/>
@@ -68,19 +71,48 @@ const Songs = () => {
 								<p className="font-medium ml-2">{item.added_by.display_name}</p>
 							</div>
 						</div>
-						<div className="w-32 flex items-center justify-center">
+						<div className="w-32 flex items-center justify-left">
 							{new Date(item.added_at).toLocaleDateString()}
 						</div>
 						<div className="w-16 flex items-center justify-center">
 							{millisToMinutesAndSeconds(track.duration_ms)}
 						</div>
-						<div className="w-16 flex items-center justify-center">
-							<button
-								onClick={() => handleRemoveTrack(track.id)}
-								className="text-red-500 hover:text-red-700"
-							>
-								Remove
-							</button>
+						<div className="w-16 relative flex items-center justify-center">
+							<div className="relative">
+								<button
+									onClick={() =>
+										setDropdownOpen((prev) => ({
+											...prev,
+											[track.id]: !prev[track.id],
+										}))
+									}
+									className="text-white hover:text-gray-300 px-2 py-1 focus:outline-none"
+								>
+									⋮
+								</button>
+
+								{/* Dropdown menu */}
+								{dropdownOpen[track.id] && (
+									<div className="absolute top-full right-0 mt-1 w-36 bg-[#18154a] border border-gray-700 rounded shadow-lg z-20">
+										<ul className="text-sm text-left text-white">
+											<li>
+												<button
+													onClick={() => {
+														handleRemoveTrack(track.id);
+														setDropdownOpen((prev) => ({
+															...prev,
+															[track.id]: false,
+														}));
+													}}
+													className="w-full text-left px-4 py-2 hover:bg-red-600"
+												>
+													Remove this song
+												</button>
+											</li>
+										</ul>
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
 				);
