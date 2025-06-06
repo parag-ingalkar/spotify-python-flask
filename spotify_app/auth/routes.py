@@ -31,4 +31,5 @@ def check_auth():
 
 @bp.route("/hello")
 def hello():
-    return {'message': 'Hello from Flask!'}
+    token_info = session.get(TOKEN_INFO, None)
+    return {"message": token_info}
