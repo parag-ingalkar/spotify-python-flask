@@ -14,7 +14,7 @@ export const Playlists = () => {
 	return (
 		<div className="py-8 px-4 md:px-8">
 			<h2 className="text-2xl font-semibold text-white mb-6">Your Playlists</h2>
-			<div class="grid grid-cols-3 gap-4">
+			<div class="grid grid-cols-2 gap-4">
 				{playlistsError && (
 					<div className="text-red-500 font-medium">{playlistsError}</div>
 				)}

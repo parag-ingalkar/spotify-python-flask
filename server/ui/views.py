@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from spotify_app.auth.utils import get_token
+from server.auth.utils import get_token
 
 bp = Blueprint("ui", __name__)
 

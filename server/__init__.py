@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
-from spotify_app.auth.routes import bp as auth_bp
-from spotify_app.api.spotify import bp as api_bp
-from spotify_app.ui.views import bp as ui_bp
+from server.auth.routes import bp as auth_bp
+from server.api.spotify import bp as api_bp
+from server.ui.views import bp as ui_bp
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)

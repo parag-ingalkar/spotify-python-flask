@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from spotify_app.auth.utils import get_token, get_spotify_client
+from server.auth.utils import get_token, get_spotify_client
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
