@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SongsRowSkeleton } from "./SongsRowSkeleton";
 
 const Songs = () => {
 	const [dropdownOpen, setDropdownOpen] = useState({});
@@ -9,24 +10,36 @@ const Songs = () => {
 
 	const tracksUrl = "http://127.0.0.1:5000/api/playlists/" + id + "/tracks";
 
-	const { data: tracks, tracksIsPending, tracksError } = useFetch(tracksUrl);
+	const {
+		data: tracks,
+		isPending: tracksIsPending,
+		error: tracksError,
+	} = useFetch(tracksUrl);
 
 	const handleRemoveTrack = (trackID) => {
 		const removeTrackURL =
 			"http://127.0.0.1:5000/api/playlists/" + id + "/tracks/" + trackID;
 
-		fetch(removeTrackURL, {
-			method: "DELETE",
-			credentials: "include",
-		})
-			.then((response) => response.json())
-			.then((data) => console.log(data))
-			.catch((error) => console.error("Error:", error));
+		if (confirm(`Remove song from playlist?`)) {
+			fetch(removeTrackURL, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					console.log(data);
+					window.location.reload();
+				})
+				.catch((error) => console.error("Error:", error));
+		}
 	};
 
 	return (
-		<div className="mt-10 h-[450px] overflow-y-auto transparent-scrollbar pr-4 overscroll-y-auto bg-scroll">
-			<div className="flex text-sm text-gray-400 border-b border-gray-700 pb-2 sticky top-0 z-50 bg-[#18154a] ">
+		<div className="mt-4 h-[550px] overflow-y-auto transparent-scrollbar mr-4 overscroll-y-auto bg-scroll">
+			<div className="flex text-sm text-gray-400 border-b border-gray-700 pb-2 sticky top-0 z-50 bg-[#101828] ">
 				<div className="w-10 flex items-center justify-left p-2">#</div>
 				<div className="flex-1 flex items-center justify-left p-2">Title</div>
 				<div className="w-48 flex items-center justify-left p-2">Album</div>
@@ -37,12 +50,20 @@ const Songs = () => {
 				<div className="w-16 flex items-center justify-left p-2">Duration</div>
 				<div className="w-16 flex items-center justify-center p-2"></div>
 			</div>
-			{tracks.map((item, index) => {
+			{tracksError && (
+				<div className="text-red-500 font-medium">{tracksError}</div>
+			)}
+			{tracksIsPending &&
+				Array(5)
+					.fill(0)
+					.map((_, i) => <SongsRowSkeleton key={i} />)}
+
+			{tracks?.map((item, index) => {
 				const track = item.track;
 				return (
 					<div
 						key={track.id}
-						className="flex text-sm py-3 border-b border-gray-800 hover:bg-gray-800"
+						className="flex text-sm py-2 border-b border-gray-800 hover:bg-gray-800"
 					>
 						<div className="w-10 flex items-center justify-left p-2">
 							{index + 1}
@@ -67,11 +88,9 @@ const Songs = () => {
 							<img
 								src={item.added_by.images?.[1]?.url || "/user.png"}
 								alt=""
-								className="w-7.5 h-7.5 rounded-full"
+								className="w-7 h-7 rounded-full"
 							/>
-							<div>
-								<p className="font-medium ml-2">{item.added_by.display_name}</p>
-							</div>
+							<p className="font-medium ml-2">{item.added_by.display_name}</p>
 						</div>
 						<div className="w-32 flex items-center justify-left p-2">
 							{new Date(item.added_at).toLocaleDateString()}
@@ -92,10 +111,9 @@ const Songs = () => {
 								>
 									⋮
 								</button>
-
 								{/* Dropdown menu */}
 								{dropdownOpen[track.id] && (
-									<div className="absolute top-full right-0 mt-1 w-36 bg-[#18154a] border border-gray-700 rounded shadow-lg z-20">
+									<div className="absolute top-full right-0 mt-1 w-36 bg-[#101828] border border-gray-700 rounded shadow-lg z-20">
 										<ul className="text-sm text-left text-white">
 											<li>
 												<button

@@ -17,13 +17,13 @@ export const PlaylistCard = ({ playlist }) => {
 				<img
 					src={imageUrl}
 					alt="Playlist cover"
-					className="w-48 h-48 rounded shadow-lg object-cover bg-gray-800"
+					className="w-46 h-46 rounded shadow-lg"
 				/>
 				<div>
 					<p className="uppercase text-sm font-semibold text-gray-400">
-						Public Playlist
+						{playlist.public ? "Public Playlist" : "Private Playlist"}
 					</p>
-					<p className="text-sm font-semibold text-gray-400">{playlist.id}</p>
+					{/* <p className="text-sm font-semibold text-gray-400">{playlist.id}</p> */}
 					<h1 className="text-5xl text-white font-bold mt-2">
 						{playlist.name}
 					</h1>

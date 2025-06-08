@@ -1,11 +1,16 @@
 import { useParams } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CollaboratorsRowSkeleton } from "./CollaboratorsRowSkeleton";
 
 const Collaborators = () => {
 	const { id } = useParams();
 	const url = "http://127.0.0.1:5000/api/playlists/" + id + "/collaborators";
-	const { data: collaborators, isPending, error } = useFetch(url);
+	const {
+		data: collaborators,
+		isPending: collaboratorsIsPending,
+		error: collaboratosError,
+	} = useFetch(url);
 
 	const [dropdownOpen, setDropdownOpen] = useState({});
 
@@ -25,7 +30,10 @@ const Collaborators = () => {
 				credentials: "include",
 			})
 				.then((response) => response.json())
-				.then((data) => console.log(data))
+				.then((data) => {
+					console.log(data);
+					window.location.reload();
+				})
 				.catch((error) => console.error("Error:", error));
 		}
 	};
@@ -33,38 +41,43 @@ const Collaborators = () => {
 	return (
 		<>
 			<div className="text-center text-xl">Collaborators</div>
-			<div className="h-[450px] mt-3 overflow-y-auto transparent-scrollbar pr-4 overscroll-y-auto ">
-				<div className="sticky top-0 z-10 bg-[#18154a] bg-opacity-100 flex text-sm text-gray-400 border-b border-gray-700 pb-2">
-					<div className="w-8 text-center items-center flex justify-center">
+			<div className="h-[550px] mt-4 overflow-y-auto transparent-scrollbar mr-4 overscroll-y-auto bg-scroll">
+				<div className="sticky top-0 z-10 bg-[#101828] bg-opacity-100 flex text-sm text-gray-400 border-b border-gray-700 pb-2">
+					<div className="w-10 flex-none flex items-center justify-left p-2">
 						#
 					</div>
-					<div className="flex-1 flex items-center justify-start px-4">
+					<div className="flex-auto flex items-center justify-left">
 						Collaborator
 					</div>
-					<div className="w-64 flex items-center justify-center text-center">
+					<div className="w-42 flex-none flex items-center justify-center text-center">
 						Number of songs added
 					</div>
 					<div className="w-16 flex items-center justify-center"></div>
 				</div>
 
-				{collaborators.map((collaborator, index) => (
+				{collaboratorsIsPending &&
+					Array(2)
+						.fill(0)
+						.map((_, i) => <CollaboratorsRowSkeleton key={i} />)}
+
+				{collaborators?.map((collaborator, index) => (
 					<div
 						key={collaborator.id}
 						className="flex text-sm py-3 border-b border-gray-800 hover:bg-gray-800"
 					>
-						<div className="w-8 flex justify-center items-center">
+						<div className="w-10 flex-none flex justify-left items-center p-2">
 							{index + 1}
 						</div>
-						<div className="flex-1 flex items-center justify-start px-4">
+						<div className="flex-auto flex items-center justify-left">
 							<img
 								src={collaborator.images?.[1]?.url || "/user.png"}
 								alt=""
-								className="w-6 h-6 rounded-full"
+								className="w-7 h-7 rounded-full"
 							/>
 							<p className="font-medium ml-2">{collaborator.display_name}</p>
 						</div>
-						<div className="w-64 flex items-center justify-center text-center">
-							"Songs Added"
+						<div className="w-42 flex-none flex items-center justify-center text-center">
+							{collaborator.song_count}
 						</div>
 						<div className="w-16 relative flex items-center justify-center">
 							<button
@@ -80,7 +93,7 @@ const Collaborators = () => {
 							</button>
 
 							{dropdownOpen[collaborator.id] && (
-								<div className="absolute top-full right-0 mt-1 w-50 bg-[#18154a] border border-gray-700 rounded shadow-lg z-20">
+								<div className="absolute top-full right-0 mt-1 w-50 bg-[#101828] border border-gray-700 rounded shadow-lg z-20">
 									<ul className="text-sm text-left text-white">
 										<li>
 											<button
@@ -91,7 +104,7 @@ const Collaborators = () => {
 														[collaborator.id]: false,
 													}));
 												}}
-												className="w-full text-left text-sm px-4 py-2 hover:bg-red-600"
+												className="w-full text-center text-[12px] p-2 hover:bg-red-600"
 											>
 												Remove all songs by this Collaborator
 											</button>

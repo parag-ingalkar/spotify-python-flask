@@ -59,14 +59,28 @@ def get_collaborators(playlist_id):
     if not sp:
         return None
 
-    collaborators_id = set()
+    collaborator_counts = {}
+
     results = sp.playlist_tracks(playlist_id)
     while results:
         for item in results['items']:
-            collaborators_id.add(item['added_by']['id'])
+            user_id = item['added_by']['id']
+            collaborator_counts[user_id] = collaborator_counts.get(user_id, 0) + 1
         results = sp.next(results) if results['next'] else None
 
-    return [sp.user(uid) for uid in collaborators_id]
+    collaborators = []
+    for user_id, count in collaborator_counts.items():
+        try:
+            user_data = sp.user(user_id)
+            user_data['song_count'] = count
+            collaborators.append(user_data)
+        except Exception as e:
+            print(f"Failed to fetch user {user_id}: {e}")
+
+    collaborators.sort(key=lambda x: x['song_count'], reverse=True)
+
+    return collaborators
+
 
 @bp.route("/playlists/<playlist_id>/collaborators")
 def api_get_collaborators(playlist_id):

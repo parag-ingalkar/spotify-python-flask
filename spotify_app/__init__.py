@@ -11,8 +11,7 @@ def create_app():
     app.secret_key = 'secret_key'
     app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie' 
     app.config.update(
-    SESSION_COOKIE_SAMESITE="Lax",  # Use "None" if serving over HTTPS
-    SESSION_COOKIE_SECURE=False,    # Use True in production with HTTPS
+       # Use True in production with HTTPS
     SECRET_KEY='your_secret_here'
 )
 
