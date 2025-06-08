@@ -4,8 +4,7 @@ import { useState } from "react";
 
 const Collaborators = () => {
 	const { id } = useParams();
-	const url =
-		"http://127.0.0.1:5000/api/playlists/" + id + "/get_collaborators";
+	const url = "http://127.0.0.1:5000/api/playlists/" + id + "/collaborators";
 	const { data: collaborators, isPending, error } = useFetch(url);
 
 	const [dropdownOpen, setDropdownOpen] = useState({});

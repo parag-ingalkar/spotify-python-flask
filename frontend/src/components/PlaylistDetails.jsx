@@ -15,6 +15,8 @@ export const PlaylistDetails = () => {
 		playlistError,
 	} = useFetch(playlistUrl);
 
+	console.log("Playlist: ", playlist);
+
 	const imageUrl = playlist.images?.[0]?.url || "/playlist.png";
 	const owner = playlist.owner?.display_name || "Unknown";
 	const tracks = playlist.tracks?.items || [];

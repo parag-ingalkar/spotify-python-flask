@@ -68,7 +68,7 @@ def get_collaborators(playlist_id):
 
     return [sp.user(uid) for uid in collaborators_id]
 
-@bp.route("/playlists/<playlist_id>/get_collaborators")
+@bp.route("/playlists/<playlist_id>/collaborators")
 def api_get_collaborators(playlist_id):
 
     collaborators = get_collaborators(playlist_id)

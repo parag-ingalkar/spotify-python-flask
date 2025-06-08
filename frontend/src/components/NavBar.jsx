@@ -13,7 +13,7 @@ export const NavBar = () => {
 
 	const handleLogout = () => {
 		console.log("Logout");
-		// window.location.href = "http://127.0.0.1:5000/logout"; // or use fetch + redirect
+		window.location.href = "http://127.0.0.1:5000/logout";
 	};
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
