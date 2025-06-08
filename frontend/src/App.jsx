@@ -12,15 +12,16 @@ import { Playlists } from "./components/Playlists";
 function App() {
 	return (
 		<BrowserRouter>
-			<div className="App"></div>
-			<div className="content">
-				<Routes>
-					<Route exact path="/" element={<Home />} />
-					<Route path="/dashboard" element={<Dashboard />}>
-						<Route index element={<Playlists />} />
-						<Route path="playlists/:id" element={<PlaylistDetails />} />
-					</Route>
-				</Routes>
+			<div className="App">
+				<div className="content">
+					<Routes>
+						<Route exact path="/" element={<Home />} />
+						<Route path="/dashboard" element={<Dashboard />}>
+							<Route index element={<Playlists />} />
+							<Route path="playlists/:id" element={<PlaylistDetails />} />
+						</Route>
+					</Routes>
+				</div>
 			</div>
 		</BrowserRouter>
 	);
