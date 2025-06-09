@@ -43,65 +43,94 @@ A Flask-based web application that integrates with the Spotify API, allowing use
    ```
 
 4. Create a `.env` file in the project root with your Spotify API credentials:
+
    ```
-   CLIENT_ID=your_spotify_client_id
-   CLIENT_SECRET=your_spotify_client_secret
+   CLIENT_ID = your_spotify_client_id
+   CLIENT_SECRET = your_spotify_client_secret
+   REDIRECT_URL = your-redirect-url
+   BASE_URL = "http://127.0.0.1:5173"
+   ```
+
+5. Install React dependencies:
+
+   ```bash
+   cd frontend/
+   npm install
    ```
 
 ## Project Structure
 
 ```
-project-root/
-├── spotify_app/
-│   ├── __init__.py         # App initialization
-│   ├── auth.py             # Authentication routes and functions
-│   ├── spotify.py          # Spotify API integration and functions
-│   └── templates/          # HTML Templates
-|       ├── home.html       # Home template
-|       └── playlists.html  # Playlists template
-├── .env                    # Environment variables (in .gitignore)
-├── run.py                  # Application entry point
-├── requirements.txt
-└── README.md
+spotify-python-flask
+├──frontend                                     # React Frontend
+│   ├──public
+│   │   ├──playlist.png                         # Default Playlist Image
+│   │   └──user.png                             # Default User Image
+│   ├──src
+│   │   ├──components
+│   │   │   ├──hooks
+│   │   │   │   └──useFetch.js                  # Custom hook to fetch data
+│   │   │   ├──Collaborators.jsx
+│   │   │   ├──CollaboratorsRowSkeleton.jsx
+│   │   │   ├──Dashboard.jsx
+│   │   │   ├──Home.jsx
+│   │   │   ├──NavBar.jsx
+│   │   │   ├──PlaylistCard.jsx
+│   │   │   ├──PlaylistCardSkeleton.jsx
+│   │   │   ├──PlaylistDetails.jsx
+│   │   │   ├──Playlists.jsx
+│   │   │   ├──Songs.jsx
+│   │   │   └──SongsRowSkeleton.jsx
+│   │   ├──App.jsx                              # Main App Component with Routes
+│   │   ├──index.css                            # Tailwindcss imports
+│   │   └──main.jsx                             # Render App Component at div.root
+│   ├──eslint.config.js
+│   ├──index.html                               # App entry-point
+│   ├──vite.config.js                           # Vite Config
+├──server                                       # Python Flask Backend Package
+│   ├──api
+│   │   ├──__init__.py
+│   │   └──spotify.py                           # Spotify data API endpoints
+│   ├──auth
+│   │   ├──__init__.py
+│   │   ├──routes.py                            # Authentication API endpoints
+│   │   └──utils.py                             # Utility functions for Authentication
+│   ├──templates                                # Basic HTML templates
+│   │   ├──home.html
+│   │   └──playlist_details.html
+│   ├──ui
+│   │   └──views.py                             # Routes to render templates
+│   ├──__init__.py                              # Define and configure Flask App
+│   └──run.py                                   # Run Flask Backend
+└──requirements.txt
 ```
 
 ## Running the Application
 
-1. Set Flask environment variables:
+1. Run the Flask development server:
 
    ```bash
-   # Windows
-   set FLASK_APP=.
-   set FLASK_ENV=development
-
-   # macOS/Linux
-   export FLASK_APP=.
-   export FLASK_ENV=development
+   python -m server.run
    ```
 
-2. Run the Flask development server:
+2. Access the backend application at `http://127.0.0.1:5000/`
+
+3. Run React Development Application
 
    ```bash
-   flask run
+   npm run dev
    ```
 
-3. Access the application at `http://127.0.0.1:5000/`
+4. Access the frontend application at `http://127.0.0.1:5173/`
 
 ## Usage
 
-1. Visit the homepage and click "Login with Spotify"
+1. Visit the homepage and click "Get Started"
 2. Authorize the application to access your Spotify account
 3. Browse your playlists and select one to view details
 4. View tracks and collaborators
-5. Remove tracks added by specific collaborators using the provided links
-
-## Troubleshooting
-
-If you encounter package compatibility issues, try installing these specific versions:
-
-```bash
-pip install flask==3.1.0 werkzeug==3.1.3 spotipy python-dotenv
-```
+5. Remove specific tracks from a playlist
+6. Remove tracks added by specific collaborators
 
 ## License
 
@@ -112,3 +141,6 @@ pip install flask==3.1.0 werkzeug==3.1.3 spotipy python-dotenv
 - [Spotify API](https://developer.spotify.com/documentation/web-api/)
 - [Spotipy](https://spotipy.readthedocs.io/)
 - [Flask](https://flask.palletsprojects.com/)
+- [Vite](https://vite.dev/guide/)
+- [React](https://react.dev/)
+- [TailwindCSS](https://tailwindcss.com/)
