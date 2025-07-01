@@ -1,6 +1,3 @@
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import "./styles.scss";
-
 //App.jsx
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
