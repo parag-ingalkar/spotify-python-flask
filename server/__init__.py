@@ -11,13 +11,17 @@ load_dotenv()  # reads from .env in root folder
 
 env = os.getenv("FLASK_ENV", "production")
 
+allowed_origins = ["http://127.0.0.1:5174", "http://127.0.0.1:5173", "https://manage-spotify-playlists-app.vercel.app"]
 
+def custom_cors_origin(origin):
+    if origin in allowed_origins:
+        return origin
+    return None 
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
-    ORIGINS = ["http://127.0.0.1:5174", "http://127.0.0.1:5173", "https://manage-spotify-playlists-app.vercel.app"]
 
-    CORS(app, supports_credentials=True, origins = ORIGINS,methods=["GET", "POST", "DELETE", "OPTIONS"])
+    CORS(app, supports_credentials=True, origins = custom_cors_origin, allow_headers=["*"], methods=["GET", "POST", "DELETE", "OPTIONS"])
     app.secret_key = 'secret_key'
     app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie' 
     
