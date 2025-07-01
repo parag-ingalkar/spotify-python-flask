@@ -1,19 +1,21 @@
 import { useNavigate } from "react-router-dom";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 export const Home = () => {
+	console.log(baseURL);
 	const navigate = useNavigate();
-
 	const handleGetStarted = async () => {
 		try {
-			const res = await fetch("http://127.0.0.1:5000/check-auth", {
+			const res = await fetch(`${baseURL}/check-auth`, {
 				credentials: "include",
 			});
 			const data = await res.json();
+			console.log(data);
 
 			if (data.authenticated) {
 				navigate("/dashboard");
 			} else {
-				window.location.href = "http://127.0.0.1:5000/login";
+				window.location.href = `${baseURL}/login`;
 			}
 		} catch (err) {
 			console.error("Error checking authentication", err);

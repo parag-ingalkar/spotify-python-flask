@@ -3,9 +3,11 @@ import useFetch from "./hooks/useFetch";
 import { useEffect, useState } from "react";
 import { CollaboratorsRowSkeleton } from "./CollaboratorsRowSkeleton";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 const Collaborators = () => {
 	const { id } = useParams();
-	const url = "http://127.0.0.1:5000/api/playlists/" + id + "/collaborators";
+	const url = `${baseURL}/api/playlists/${id}/collaborators`;
 	const {
 		data: collaborators,
 		isPending: collaboratorsIsPending,
@@ -15,10 +17,7 @@ const Collaborators = () => {
 	const [dropdownOpen, setDropdownOpen] = useState({});
 
 	const handleRemoveTracksByCollaborator = (collaborator) => {
-		const removeTrackURL =
-			"http://127.0.0.1:5000/api/playlists/" +
-			id +
-			"/tracks/remove_by_collaborator";
+		const removeTrackURL = `${baseURL}/api/playlists/${id}/tracks/remove_by_collaborator`;
 
 		if (confirm(`Remove all songs added by ${collaborator.display_name}?`)) {
 			fetch(removeTrackURL, {

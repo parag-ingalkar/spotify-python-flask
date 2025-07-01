@@ -6,9 +6,11 @@ import Collaborators from "./Collaborators";
 import Songs from "./Songs";
 import { PlaylistCardSkeleton } from "./PlaylistCardSkeleton";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 export const PlaylistDetails = () => {
 	const { id } = useParams();
-	const playlistUrl = "http://127.0.0.1:5000/api/playlists/" + id;
+	const playlistUrl = `${baseURL}/api/playlists/${id}`;
 
 	const {
 		data: playlist,

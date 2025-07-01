@@ -3,12 +3,14 @@ import useFetch from "./hooks/useFetch";
 import { useState, useEffect } from "react";
 import { SongsRowSkeleton } from "./SongsRowSkeleton";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 const Songs = () => {
 	const [dropdownOpen, setDropdownOpen] = useState({});
 
 	const { id } = useParams();
 
-	const tracksUrl = "http://127.0.0.1:5000/api/playlists/" + id + "/tracks";
+	const tracksUrl = `${baseURL}/api/playlists/${id}/tracks`;
 
 	const {
 		data: tracks,
@@ -17,8 +19,7 @@ const Songs = () => {
 	} = useFetch(tracksUrl);
 
 	const handleRemoveTrack = (trackID) => {
-		const removeTrackURL =
-			"http://127.0.0.1:5000/api/playlists/" + id + "/tracks/" + trackID;
+		const removeTrackURL = `${baseURL}/api/playlists/${id}/tracks/${trackID}`;
 
 		if (confirm(`Remove song from playlist?`)) {
 			fetch(removeTrackURL, {

@@ -2,18 +2,20 @@ import { Link } from "react-router-dom";
 import useFetch from "./hooks/useFetch";
 import { useState } from "react";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 export const NavBar = () => {
 	const {
 		data: user,
 		isPending: userIsPending,
 		error: userError,
-	} = useFetch("http://127.0.0.1:5000/api/me");
+	} = useFetch(`${baseURL}/api/me`);
 
 	const profileImg = user?.images?.[0]?.url || "/user.png";
 
 	const handleLogout = () => {
 		console.log("Logout");
-		window.location.href = "http://127.0.0.1:5000/logout";
+		window.location.href = `${baseURL}/logout`;
 	};
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -32,9 +34,9 @@ export const NavBar = () => {
 				<Link to="/dashboard" className="px-2 text-white hover:text-green-400">
 					Manage Playlist
 				</Link>
-				<Link to="/#" className="px-2 text-white hover:text-green-400">
+				{/* <Link to="/#" className="px-2 text-white hover:text-green-400">
 					Create Playlist
-				</Link>
+				</Link> */}
 			</div>
 			{/* Profile dropdown */}
 			{user && (
