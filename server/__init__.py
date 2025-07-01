@@ -16,7 +16,7 @@ env = os.getenv("FLASK_ENV", "production")
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
 
-    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173","https://manage-spotify-playlists-app.vercel.app","http://127.0.0.1:4173"],methods=["GET", "POST", "DELETE", "OPTIONS"])
+    CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173","https://manage-spotify-playlists-app.vercel.app"],methods=["GET", "POST", "DELETE", "OPTIONS"])
     app.secret_key = 'secret_key'
     app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie' 
     

@@ -3,6 +3,10 @@
         {
             "source": "/(.*)",
             "destination": "/"
+        },
+        {
+            "source": "/api/:path*",
+            "destination": "https://spotify-backend-0c94.onrender.com/api/:path*"
         }
     ]
 }
