@@ -5,6 +5,8 @@ const useFetch = (url) => {
 	const [error, setError] = useState(null);
 	const [data, setData] = useState(null); // changed to null
 
+	console.log(url);
+
 	useEffect(() => {
 		const abortCont = new AbortController();
 

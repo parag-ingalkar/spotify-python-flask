@@ -44,7 +44,7 @@ def create_app():
             SESSION_COOKIE_SECURE=False,
         )
 
-    print(f"FLASK_ENV = {env}")
+    print(f"FLASK_ENV = {app.config['ENV']}")
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
